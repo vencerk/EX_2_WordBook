@@ -13,6 +13,7 @@ public class MyDH extends SQLiteOpenHelper {
     private Context mContext;
 
     public MyDH (Context context, String name, SQLiteDatabase.CursorFactory factory ,int version){
+
         super(context,name,factory,version);
         mContext=context;
     }

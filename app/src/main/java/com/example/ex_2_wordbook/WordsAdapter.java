@@ -17,7 +17,6 @@ public class WordsAdapter extends ArrayAdapter<Words> {
 
     }
 
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Words words =getItem(position);

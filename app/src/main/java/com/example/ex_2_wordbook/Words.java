@@ -6,6 +6,9 @@ public class Words {
     private String word ;
     private String meanings ;
     private String exS ;
+    public Words(String word){
+        this.word= word;
+    }
     public Words(String word,String meanings){
         this.word= word;
         this.meanings=meanings;

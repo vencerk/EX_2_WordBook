@@ -2,6 +2,7 @@ package com.example.ex_2_wordbook;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,17 +27,34 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-
+    TextView tv1,tvM,tvE;
     private MyDH dbHelper = new MyDH(this, "Ven.db", null, 1);
-
+    private int flag = 0;
     private List<Words> wordsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        //进入软件及显示所有单词
-        queryALL();
+
+        if(this.getResources().getConfiguration().orientation== Configuration.ORIENTATION_PORTRAIT) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+            //进入软件及显示所有单词
+            flag=0;
+            queryALL();
+        }
+        else if(this.getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+            flag=1;
+            queryALL();
+            /*
+            tvM=(TextView)findViewById(R.id.meaningsName);
+            tvE=findViewById(R.id.exSName);
+            tvE.setVisibility(View.GONE);
+            tvM.setVisibility(View.GONE);
+            */
+        }
+
     }
 
     @Override
@@ -75,8 +94,26 @@ public class MainActivity extends AppCompatActivity {
         WordsAdapter adapter = new WordsAdapter(MainActivity.this, R.layout.words_item, wordsList);
         ListView lv = (ListView) findViewById(R.id.listWords);
         lv.setAdapter(adapter);
-    }
+        //点击单词，右边编辑框出现释义及例句
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(flag==1){
 
+                    //String word=wordsList.get(i).getWord();
+                    String meanings=wordsList.get(i).getMeanings();
+                    String exS=wordsList.get(i).getExS();
+                    tv1=(TextView) findViewById(R.id.tv1);
+                    tv1.setText("");
+                    tv1.append("释义："+meanings);
+                    tv1.append("\n");
+                    tv1.append("例句："+exS);
+                    //Toast.makeText(MainActivity.this,word,Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+    }
     //初始化单词列表
     public void initWords() {
         wordsList.clear();
@@ -88,12 +125,18 @@ public class MainActivity extends AppCompatActivity {
                 String word = cursor.getString(cursor.getColumnIndex("word"));
                 String meanings = cursor.getString(cursor.getColumnIndex("meanings"));
                 String exS = cursor.getString(cursor.getColumnIndex("exampleSentence"));
-                Words w1 = new Words(word, meanings, exS);
+                Words w1;
+
+                    w1 = new Words(word, meanings, exS);
+
+                    //w1 = new Words(word," "," ");
+
                 wordsList.add(w1);
             } while (cursor.moveToNext());
         }
         cursor.close();
     }
+
 
     //添加单词
     public void addWord(){

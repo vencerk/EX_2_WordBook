@@ -11,16 +11,23 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private MyDH dbHelper = new MyDH(this, "Ven.db", null, 1);;
-    TextView show1,show2;
+    private List<Words> wordsList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
     @Override
+    //选项菜单
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
@@ -116,7 +124,36 @@ public class MainActivity extends AppCompatActivity {
     }
     //显示所有单词
     public void queryALL(){
+        initWords();
+        WordsAdapter adapter = new WordsAdapter(MainActivity.this,R.layout.words_item,wordsList);
+        ListView lv = (ListView)findViewById(R.id.listWords);
+        lv.setAdapter(adapter);
+        /*
+        ListView lv = (ListView)findViewById(R.id.listWords);
+        ArrayList<Map<String, String>> list= new ArrayList<Map<String, String>>();
+        Map map = new HashMap();
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        list.add(map);
+        Map map1 = new HashMap();
+        map1.put("key1", "value1");
+        map1.put("key2", "value2");
+        list.add(map1);
+        ArrayAdapter adapter = new ArrayAdapter(MainActivity.this,android.R.layout.simple_list_item_1,list);
+        lv.setAdapter(adapter);
+        */
+        /*
+        for(int i = 0;i < list.size();i++)
 
+        {
+            Map m = list.get(i);
+            String authorStr = m.get("key1").toString();
+            System.out.println("author" + " : " + authorStr);
+
+        }
+        */
+
+        /*
         show1 = findViewById(R.id.textShow);
         show1.setText("");
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -136,5 +173,22 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
         }
         cursor.close();
+        */
     }
+    //初始化单词列表
+    public void initWords(){
+        for(int i =0;i<1;i++){
+            Words w1 = new Words("up","上");
+            wordsList.add(w1);
+
+            Words w2 = new Words("down","下");
+            wordsList.add(w2);
+
+           // Words w3 = new Words("left","左");
+            //wordsList.add(w3);
+
+
+        }
+    }
+
 }

@@ -6,10 +6,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
 public class MyDH extends SQLiteOpenHelper {
+    //创建单词表
     public static final String CREAT_BOOK =
             "create table WordsBook ("
             + "word varchar(50) primary key,"
-            + "meanings text)";
+            + "meanings text,"
+            + "exampleSentence text)";
+
     private Context mContext;
 
     public MyDH (Context context, String name, SQLiteDatabase.CursorFactory factory ,int version){

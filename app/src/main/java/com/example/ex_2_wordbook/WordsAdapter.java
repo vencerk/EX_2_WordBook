@@ -20,13 +20,17 @@ public class WordsAdapter extends ArrayAdapter<Words> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Words words =getItem(position);
-        View view = LayoutInflater.from(getContext()).inflate(resourceId,parent,false);
+
+        View view= LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
+        //取得 三个textview，
         TextView wordName = (TextView) view.findViewById(R.id.wordName);
         TextView meaningsName = (TextView) view.findViewById(R.id.meaningsName);
         TextView exSName=(TextView) view.findViewById(R.id.exSName);
+        //将word的三个属性，word、meanings、exs放到三个textview
         wordName.setText(words.getWord());
         meaningsName.append(words.getMeanings());
         exSName.append(words.getExS());
+
         return view;
     }
 }

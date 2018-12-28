@@ -6,6 +6,7 @@ public class Words {
     private String word ;
     private String meanings ;
     private String exS ;
+
     public Words(String word){
         this.word= word;
     }
@@ -18,6 +19,7 @@ public class Words {
         this.meanings=meanings;
         this.exS=exS;
     }
+
     public String getExS() {
         return exS;
     }

@@ -27,10 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    TextView tv1,tvM,tvE;
-    private MyDH dbHelper = new MyDH(this, "Ven.db", null, 1);
-    private int flag = 0;
-    private List<Words> wordsList = new ArrayList<>();
+    TextView tv1;
+    private MyDH dbHelper = new MyDH(this, "Ven.db", null, 1);//连接数据库
+    private int flag = 0;//横竖屏flag，用于列表显示
+
+    private List<Words> wordsList = new ArrayList<>();//单词列表
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,15 +93,16 @@ public class MainActivity extends AppCompatActivity {
     //显示所有单词
     public void queryALL() {
         initWords();//初始化单词列表
+        //在listview里面显示单词列表
         WordsAdapter adapter = new WordsAdapter(MainActivity.this, R.layout.words_item, wordsList);
-        ListView lv = (ListView) findViewById(R.id.listWords);
+        ListView lv = findViewById(R.id.listWords);
         lv.setAdapter(adapter);
+
         //点击单词，右边编辑框出现释义及例句
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(flag==1){
-
+                if(flag==1){//横屏才操作，显示释义及例句
                     //String word=wordsList.get(i).getWord();
                     String meanings=wordsList.get(i).getMeanings();
                     String exS=wordsList.get(i).getExS();
@@ -114,51 +117,59 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
     //初始化单词列表
     public void initWords() {
         wordsList.clear();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        //查询语句
         String ins = "select * from WordsBook";
+        //将返回的结果放到cursor里
         Cursor cursor = db.rawQuery(ins, null);
         if (cursor.moveToFirst()) {
             do {
+                //取得列值
                 String word = cursor.getString(cursor.getColumnIndex("word"));
                 String meanings = cursor.getString(cursor.getColumnIndex("meanings"));
                 String exS = cursor.getString(cursor.getColumnIndex("exampleSentence"));
-                Words w1;
-
-                    w1 = new Words(word, meanings, exS);
-
-                    //w1 = new Words(word," "," ");
-
+                //创建一个单词，并初始化
+                Words w1 = new Words(word, meanings, exS);
+                //w1 = new Words(word," "," ");
+                //将单词加入单词列表
                 wordsList.add(w1);
             } while (cursor.moveToNext());
         }
-        cursor.close();
+        cursor.close();//关闭cursor
     }
 
 
     //添加单词
     public void addWord(){
         LayoutInflater factory = LayoutInflater.from(MainActivity.this);
+        //加载事先编好的界面dialog.xml
         final View textEntryView = factory.inflate(R.layout.dialog, null);
+        //三个输入框
         final EditText editTextWord = (EditText) textEntryView.findViewById(R.id.editTextWord);
         final EditText editTextMeanings = (EditText) textEntryView.findViewById(R.id.editTextMeanings);
         final EditText editTextExS = (EditText) textEntryView.findViewById(R.id.editTextExS);
+        //设置对话框
         AlertDialog.Builder ad1 = new AlertDialog.Builder(MainActivity.this);
         ad1.setTitle("添加新单词:");
         ad1.setView(textEntryView);
         ad1.setPositiveButton("添加", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int i) {
                 try {
+                    //获取三个编辑框的内容
                     String s1 = editTextWord.getText().toString();
                     String s2 = editTextMeanings.getText().toString();
                     String s3 = editTextExS.getText().toString();
+                    //连接数据库
                     SQLiteDatabase db = dbHelper.getWritableDatabase();
-                    //String ins = "insert into WordsBook values";
+                    //插入语句
                     String ins = "insert into WordsBook values (?,?,?)";
                     db.execSQL(ins, new String[]{s1, s2, s3});
                     Toast.makeText(getApplicationContext(), "添加成功", Toast.LENGTH_LONG).show();
+                    //添加成功后重新显示所有单词
                     queryALL();
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), "添加失败", Toast.LENGTH_LONG).show();
@@ -172,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         });
         ad1.show();
     }
+
     //删除单词
     public void delWord() {
         final EditText et = new EditText(this);
@@ -181,7 +193,9 @@ public class MainActivity extends AppCompatActivity {
         ad1.setPositiveButton("删除", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int i) {
                 try {
+
                     String s1 = et.getText().toString();
+
                     SQLiteDatabase db = dbHelper.getWritableDatabase();
                     String ins = "DELETE FROM WordsBook WHERE word = ?";
                     //先查询是否有此单词
@@ -196,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "不存在此单词", Toast.LENGTH_LONG).show();
                     }
                     cursor.close();
-
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), "删除失败", Toast.LENGTH_LONG).show();
                 }
@@ -206,11 +219,11 @@ public class MainActivity extends AppCompatActivity {
         });
         ad1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int i) {
-
             }
         });
         ad1.show();
     }
+
     //修改单词
     public void updateWord(){
         LayoutInflater factory = LayoutInflater.from(MainActivity.this);
@@ -232,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
                     String ins2 = "select * from WordsBook WHERE word = ?";
                     Cursor cursor = db.rawQuery(ins2,new String[]{s1});
                     if (cursor.moveToFirst()) {//如果存在
-
                         //先将此单词删除
                         String ins1 = "DELETE FROM WordsBook WHERE word = ?";
                         db.execSQL(ins1, new String[]{s1});
@@ -246,7 +258,6 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "不存在此单词", Toast.LENGTH_LONG).show();
                     }
                     cursor.close();
-
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), "修改失败", Toast.LENGTH_LONG).show();
                 }
@@ -260,6 +271,7 @@ public class MainActivity extends AppCompatActivity {
         });
         ad1.show();
     }
+
     //查询单词
     public void queWord(){
         wordsList.clear();
@@ -272,7 +284,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     String s1 = et.getText().toString();
                     SQLiteDatabase db = dbHelper.getWritableDatabase();
-
                     String ins = "select * from WordsBook where word like ? ";
                     Cursor cursor = db.rawQuery(ins,new String[]{"%"+s1+"%"});
                     if (cursor.moveToFirst()) {
@@ -299,4 +310,53 @@ public class MainActivity extends AppCompatActivity {
         });
         ad1.show();
     }
+    //一键添加单词
+    /*
+    public void oneAddWords(){
+        String s1="";
+        String s2="";
+        String s3="";
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        //String ins = "insert into WordsBook values";
+        String ins = "insert into WordsBook values (?,?,?)";
+
+        s1="day";
+        s2="一天;白天;时期;节日";
+        s3="I saw Tom three days ago.";
+        db.execSQL(ins, new String[]{s1, s2, s3});
+        s1="night";
+        s2="晚上;夜;";
+        s3="They sleep by day and hunt by night .";
+        db.execSQL(ins, new String[]{s1, s2, s3});
+        s1="computer";
+        s2="计算机，电脑";
+        s3="a personal computer";
+        db.execSQL(ins, new String[]{s1, s2, s3});
+        s1="deliberate";
+        s2="深思熟虑的;故意的;蓄意的;慎重的";
+        s3="a deliberate act of vandalism";
+        db.execSQL(ins, new String[]{s1, s2, s3});
+        s1="government";
+        s2="政府;政体;治理的形式;管辖，治理";
+        s3="the government of the day";
+        db.execSQL(ins, new String[]{s1, s2, s3});
+        s1="one";
+        s2="一个人;一体;一点钟;独一";
+        s3="Do you want one or two?";
+        db.execSQL(ins, new String[]{s1, s2, s3});
+        s1="son";
+        s2="儿子;孩子;男性后裔;";
+        s3="We have two sons and a daughter.";
+        db.execSQL(ins, new String[]{s1, s2, s3});
+        s1="god";
+        s2="上帝，造物主";
+        s3="Do you believe in God ?";
+        db.execSQL(ins, new String[]{s1, s2, s3});
+        s1="sky";
+        s2="天空";
+        s3="the night sky";
+
+        db.execSQL(ins, new String[]{s1, s2, s3});
+    }*/
 }
